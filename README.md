@@ -1,6 +1,6 @@
 # WLED CLI
 
-![Pub Version](https://img.shields.io/pub/v/wled-cli)
+![Pub Version](https://img.shields.io/pub/v/wled_cli)
 
 🚧 **ATTENTION!** Current version is heavily in development and public API might change multiple times before the 1.0 release. 🚧
 
