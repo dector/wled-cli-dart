@@ -1,13 +1,18 @@
 name: wled_cli
 description: CLI for controlling WLED instances
-version: 0.0.1
+version: 0.0.2
 repository: https://github.com/dector/wled-cli-dart
+
+executables:
+  wled_cli:
+  main: wled_cli
 
 environment:
   sdk: ^3.2.5
 
 dependencies:
   args: ^2.4.2
+  wled: ^0.0.3
 
 dev_dependencies:
   lints: ^2.1.0

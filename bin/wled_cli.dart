@@ -1,61 +1,71 @@
+import 'dart:io';
+
 import 'package:args/args.dart';
+import 'package:wled/wled.dart';
 
-const String version = '0.0.1';
-
-ArgParser buildParser() {
-  return ArgParser()
-    ..addFlag(
-      'help',
-      abbr: 'h',
-      negatable: false,
-      help: 'Print this usage information.',
-    )
-    ..addFlag(
-      'verbose',
-      abbr: 'v',
-      negatable: false,
-      help: 'Show additional command output.',
-    )
-    ..addFlag(
-      'version',
-      negatable: false,
-      help: 'Print the tool version.',
-    );
+void main(List<String> args) async {
+  final opts = parseOptions(args);
+  await execMain(opts);
 }
 
-void printUsage(ArgParser argParser) {
-  print('Usage: dart wled_cli <flags> [arguments]');
-  print(argParser.usage);
-}
+Opts parseOptions(List<String> args) {
+  final ArgParser argParser = ArgParser();
 
-void main(List<String> arguments) {
-  final ArgParser argParser = buildParser();
-  try {
-    final ArgResults results = argParser.parse(arguments);
-    bool verbose = false;
+  final parsed = argParser.parse(args).rest;
 
-    // Process the parsed arguments.
-    if (results.wasParsed('help')) {
-      printUsage(argParser);
-      return;
-    }
-    if (results.wasParsed('version')) {
-      print('wled_cli_dart version: $version');
-      return;
-    }
-    if (results.wasParsed('verbose')) {
-      verbose = true;
+  final command = parsed.elementAtOrNull(0)?.trim() ?? '';
+  if (command == 'toggle') {
+    final IpAddress ip;
+    try {
+      ip = IpAddress(parsed[1]);
+    } on RangeError {
+      return OptsError('IP is not provided');
     }
 
-    // Act on the arguments provided.
-    print('Positional arguments: ${results.rest}');
-    if (verbose) {
-      print('[VERBOSE] All arguments: ${results.arguments}');
-    }
-  } on FormatException catch (e) {
-    // Print usage information if an invalid argument was provided.
-    print(e.message);
-    print('');
-    printUsage(argParser);
+    return OptsToggle(ip);
+  } else {
+    return OptsError('Unknown command');
   }
+}
+
+Future<void> execMain(Opts args) async {
+  if (args is OptsError) {
+    print("Error: ${args.text}");
+    exit(1);
+  }
+
+  if (args is OptsAction) {
+    final wled = Wled(args.ip.value);
+    if (args is OptsToggle) {
+      await wled.toggle();
+    }
+  }
+
+  exit(0);
+}
+
+sealed class Opts {}
+
+sealed class OptsSystem extends Opts {}
+
+class OptsError extends OptsSystem {
+  final String text;
+
+  OptsError(this.text);
+}
+
+sealed class OptsAction extends Opts {
+  final IpAddress ip;
+
+  OptsAction(this.ip);
+}
+
+class OptsToggle extends OptsAction {
+  OptsToggle(IpAddress ip) : super(ip);
+}
+
+class IpAddress {
+  final String value;
+
+  const IpAddress(this.value);
 }

@@ -17,6 +17,11 @@ See [CHANGELOG.md](CHANGELOG.md).
 🚧 **TDB** 🚧
 
 
+### Commands
+
+**Toggle**: `wled_cli toggle <host>`.
+
+
 ## Roadmap
 
 🚧 **TDB** 🚧
