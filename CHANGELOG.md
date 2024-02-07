@@ -1,4 +1,4 @@
-## [0.0.3] - SNAPSHOT
+## [0.0.3] - 07 Feb 2024
 
 ### New
 - Add `brightness` command for setting brightness.
